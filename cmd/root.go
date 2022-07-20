@@ -7,6 +7,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/SunJary/dut/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -15,9 +16,9 @@ var rootCmd = &cobra.Command{
 	Use:   "dut",
 	Short: "du like command",
 	Long:  `du like command`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		pkg.Start()
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
