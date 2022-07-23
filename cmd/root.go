@@ -7,6 +7,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/SunJary/dut/pkg"
 	"github.com/spf13/cobra"
@@ -22,13 +24,19 @@ var rootCmd = &cobra.Command{
 	Short: "du like command",
 	Long:  `du like command in tree view`,
 	Run: func(cmd *cobra.Command, args []string) {
+		startTime := time.Now().UnixMilli()
+
 		len := len(args)
 		var dirList = make([]pkg.Dir, 0, len)
 		if len == 0 {
 			// 没有参数，默认当前目录
+			currDirName, err := os.Getwd()
+			if err != nil {
+				currDirName = "."
+			}
 			dir := pkg.Dir{}
-			dir.File.Name = "."
-			dir.File.Path = "."
+			dir.File.Name = currDirName
+			dir.File.Path = currDirName
 			dir.File.IsDir = true
 
 			dirList = append(dirList, dir)
@@ -46,11 +54,16 @@ var rootCmd = &cobra.Command{
 					continue
 				}
 
+				absDirName, err := filepath.Abs(dirName)
+				if err != nil {
+					absDirName = "."
+				}
+
 				dir := pkg.Dir{}
-				dir.File.Name = dirName
+				dir.File.Name = absDirName
 				dir.File.IsDir = info.IsDir()
 				if dir.File.IsDir {
-					dir.File.Path = dirName
+					dir.File.Path = absDirName
 				} else {
 					dir.File.Size = pkg.ByteSize(info.Size())
 				}
@@ -66,6 +79,8 @@ var rootCmd = &cobra.Command{
 			pkg.Print(&dirList[index], level-1, 0, "")
 		}
 
+		duration := time.Now().UnixMilli() - startTime
+		fmt.Printf("耗时：%dms\n", duration)
 	},
 }
 

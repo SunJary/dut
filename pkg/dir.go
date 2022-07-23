@@ -5,13 +5,15 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
-	"strings"
+	"sync"
 )
 
-var Root Dir
-var goos = runtime.GOOS
-var dirSp = string(filepath.Separator)
-var linuxSkipDir = map[string]struct{}{"/proc": {}, "/proc/": {}}
+var (
+	Root         Dir
+	goos         = runtime.GOOS
+	dirSp        = string(filepath.Separator)
+	linuxSkipDir = map[string]struct{}{"/proc": {}, "/proc/": {}}
+)
 
 func ReadDir(dir *Dir) {
 	if !dir.File.IsDir {
@@ -29,6 +31,8 @@ func ReadDir(dir *Dir) {
 		return
 	}
 
+	var wg sync.WaitGroup
+
 	childs := make([]Dir, 0, childLen)
 	// 遍历所有文件 或 目录
 	for _, info := range infos {
@@ -38,18 +42,29 @@ func ReadDir(dir *Dir) {
 		item.File.Size = ByteSize(info.Size())
 		// 如果是目录的话，记录路径，文件的话不需要记录
 		if item.File.IsDir {
-			item.File.Path = strings.TrimRight(dir.File.Path, dirSp) + dirSp + info.Name()
+			item.File.Path = filepath.Join(dir.File.Path, item.File.Name)
 		}
 		childs = append(childs, item)
 	}
 
 	dir.Clilds = childs
 
-	var dirSize ByteSize
 	for index, item := range dir.Clilds {
 		if item.File.IsDir && !isSkipDir(item) {
-			ReadDir(&dir.Clilds[index])
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				ReadDir(&dir.Clilds[i])
+			}(index)
 		}
+	}
+
+	// 等待子目录统计结束后
+	wg.Wait()
+
+	// 计算当前目录的大小
+	var dirSize ByteSize
+	for index := range dir.Clilds {
 		dirSize = dirSize + dir.Clilds[index].File.Size
 	}
 
