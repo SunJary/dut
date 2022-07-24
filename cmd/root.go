@@ -80,7 +80,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		duration := time.Now().UnixMilli() - startTime
-		fmt.Printf("耗时：%dms\n", duration)
+		fmt.Printf("耗时：%.3fs\n", float64(duration)/1000)
 	},
 }
 

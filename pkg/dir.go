@@ -11,7 +11,6 @@ import (
 var (
 	Root         Dir
 	goos         = runtime.GOOS
-	dirSp        = string(filepath.Separator)
 	linuxSkipDir = map[string]struct{}{"/proc": {}, "/proc/": {}}
 )
 
@@ -70,7 +69,6 @@ func ReadDir(dir *Dir) {
 
 	dir.File.Size = dirSize
 
-	return
 }
 
 func isSkipDir(dir Dir) bool {
