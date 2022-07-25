@@ -1,9 +1,16 @@
 package pkg
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/fatih/color"
+)
 
 const space3 = "   "
 const space4 = "    "
+
+// 目录名打印为蓝色文字
+var dirP = color.BlueString
 
 /*
 	打印目录结构
@@ -31,7 +38,16 @@ func Print(dir *Dir, level, n int, head string) {
 		}
 
 		near := currentLevel + "──"
-		fmt.Printf("%-8s %s %s\n", renderSize(item.File.Size, 0), head+near, item.File.Name)
+
+		// 如果是目录，打印为蓝色字
+		var fileNameP string
+		if item.File.IsDir {
+			fileNameP = dirP(item.File.Name)
+		} else {
+			fileNameP = item.File.Name
+		}
+
+		fmt.Printf("%-8s %s %s\n", renderSize(item.File.Size, 0), head+near, fileNameP)
 		if (level < 0 || n < level) && item.File.IsDir {
 			lastLevel := ""
 			if !isLast {
