@@ -32,5 +32,5 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().IntVarP(&config.PrintLevel, "level", "l", 1, "tree level")
-	rootCmd.Flags().BoolVarP(&config.Interact, "it", "it", true, "interact")
+	rootCmd.Flags().BoolVarP(&config.Interact, "it", "i", false, "interact")
 }
