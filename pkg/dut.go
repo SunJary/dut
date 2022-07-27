@@ -7,20 +7,26 @@ import (
 	"time"
 )
 
+var dirList []Dir
+
 func RunDut(args []string, config Config) {
 	startTime := time.Now().UnixMilli()
 
-	dirList := getTarget(args)
+	dirList = getTarget(args)
 
 	for index := range dirList {
 
 		ReadDir(&dirList[index])
 
-		Print(&dirList[index], config.PrintLevel-1, 0, "")
+		Print(&dirList[index], config, 0, "")
 	}
 
 	duration := time.Now().UnixMilli() - startTime
 	fmt.Printf("耗时：%.3fs\n", float64(duration)/1000)
+
+	if config.Interact {
+		Interact()
+	}
 }
 
 // 根据参数获取目标文件夹

@@ -18,10 +18,10 @@ var dirP = color.BlueString
 	level 要打印多少层
 	n 当前是
 */
-func Print(dir *Dir, level, n int, head string) {
+func Print(dir *Dir, config Config, n int, head string) {
 
 	if n == 0 {
-		fmt.Printf("%-8s %s\n", renderSize(dir.File.Size, 0), dir.File.Name)
+		fmt.Printf("%-8s %s\n", renderSize(dir.File.Size, config.SzieUnit), dir.File.Name)
 	}
 
 	len := len(dir.Clilds)
@@ -47,8 +47,8 @@ func Print(dir *Dir, level, n int, head string) {
 			fileNameP = item.File.Name
 		}
 
-		fmt.Printf("%-8s %s %s\n", renderSize(item.File.Size, 0), head+near, fileNameP)
-		if (level < 0 || n < level) && item.File.IsDir {
+		fmt.Printf("%-8s %s %s\n", renderSize(item.File.Size, config.SzieUnit), head+near, fileNameP)
+		if (config.PrintLevel < 0 || n < config.PrintLevel) && item.File.IsDir {
 			lastLevel := ""
 			if !isLast {
 				lastLevel = "│" + space3
@@ -56,7 +56,7 @@ func Print(dir *Dir, level, n int, head string) {
 				lastLevel = space4
 			}
 
-			Print(&item, level, n+1, head+lastLevel)
+			Print(&item, config, n+1, head+lastLevel)
 		}
 	}
 }

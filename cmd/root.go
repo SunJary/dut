@@ -31,6 +31,12 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().IntVarP(&config.PrintLevel, "level", "l", 1, "tree level")
+	var level int
+	rootCmd.Flags().IntVarP(&level, "level", "l", 1, "tree level")
+	config.PrintLevel = level - 1
+
 	rootCmd.Flags().BoolVarP(&config.Interact, "it", "i", false, "interact")
+
+	rootCmd.Flags().StringVarP(&config.SzieUnit, "unit", "u", "", "sizeUnit K/M/G/T/P/E/Z/Y")
+
 }
