@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -19,12 +19,12 @@ func ReadDir(dir *Dir) {
 		return
 	}
 	// 获取当前目录下所有文件 或 目录
-	infos, err := ioutil.ReadDir(dir.File.Path)
+	dirEntrys, err := os.ReadDir(dir.File.Path)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	childLen := len(infos)
+	childLen := len(dirEntrys)
 
 	if childLen == 0 {
 		return
@@ -34,12 +34,20 @@ func ReadDir(dir *Dir) {
 
 	childs := make([]Dir, 0, childLen)
 	// 遍历所有文件 或 目录
-	for _, info := range infos {
+	for _, dirEntry := range dirEntrys {
 		item := Dir{}
-		item.File.Name = info.Name()
-		item.File.IsDir = info.IsDir()
+		item.File.Name = dirEntry.Name()
+		item.File.IsDir = dirEntry.IsDir()
+
+		// 获取文件大小等信息
+		info, err := dirEntry.Info()
+		if err != nil {
+			fmt.Println(err.Error())
+			continue
+		}
 		item.File.Size = ByteSize(info.Size())
 		item.File.SetUsage(info)
+
 		// 如果是目录的话，记录路径，文件的话不需要记录
 		if item.File.IsDir {
 			item.File.Path = filepath.Join(dir.File.Path, item.File.Name)
