@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 Jary <jarysun@outlook.com>
-
 */
 package cmd
 
@@ -18,9 +17,7 @@ var rootCmd = &cobra.Command{
 	Use:   "dut",
 	Short: "du like command",
 	Long:  `du like command in tree view`,
-	Run: func(cmd *cobra.Command, args []string) {
-		pkg.RunDut(args, config)
-	},
+	Run:   run,
 }
 
 func Execute() {
@@ -31,12 +28,16 @@ func Execute() {
 }
 
 func init() {
-	var level int
-	rootCmd.Flags().IntVarP(&level, "level", "l", 1, "tree level")
-	config.PrintLevel = level - 1
+	rootCmd.Flags().IntVarP(&config.PrintLevel, "level", "l", 1, "tree level")
 
-	rootCmd.Flags().BoolVarP(&config.Interact, "it", "i", false, "interact")
+	rootCmd.Flags().BoolVarP(&config.Interact, "interact", "i", false, "interact")
 
-	rootCmd.Flags().StringVarP(&config.SzieUnit, "unit", "u", "", "sizeUnit K/M/G/T/P/E/Z/Y")
+	rootCmd.Flags().BoolVarP(&config.Usage, "usage", "u", false, "usage")
 
+	rootCmd.Flags().StringVarP(&config.ByteSzieUnit, "byte", "b", "", "Byte size unit,allow K/M/G/T/P/E/Z/Y , default auto")
+}
+
+func run(cmd *cobra.Command, args []string) {
+	config.Init()
+	pkg.RunDut(args, config)
 }

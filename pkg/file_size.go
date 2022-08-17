@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var AllowUnit = map[string]ByteSize{
+var AllowUnit = map[string]float64{
 	"K": KB,
 	"M": MB,
 	"G": GB,
@@ -18,20 +18,30 @@ var AllowUnit = map[string]ByteSize{
 }
 
 // 根据规则显示文件的大小
-func renderSize(size ByteSize, unit string) string {
+func renderSize(file File, config Config) string {
+	var fsize float64
+	unit := config.ByteSzieUnit
+	usage := config.Usage
+
+	if usage {
+		fsize = float64(file.Usage)
+	} else {
+		fsize = float64(file.Size)
+	}
+
 	if unit == "" {
-		return autoSize(size)
+		return autoSize(fsize)
 	}
 	// 以指定的单位打印
 	unitSz, err := SizeUnit2Byte(unit)
 	if err != nil {
-		return fmt.Sprintf("%.2f", size/unitSz)
+		return fmt.Sprintf("%.1f", fsize/unitSz)
 	}
-	return fmt.Sprintf("%.2f%s", size/unitSz, unit)
+	return fmt.Sprintf("%.1f%s", fsize/unitSz, unit)
 }
 
 // 通过字符串单位获取单位的大小
-func SizeUnit2Byte(unit string) (ByteSize, error) {
+func SizeUnit2Byte(unit string) (float64, error) {
 	unit = strings.ToUpper(unit)
 
 	value, ok := AllowUnit[unit]
@@ -44,23 +54,23 @@ func SizeUnit2Byte(unit string) (ByteSize, error) {
 }
 
 // 自动以合适的单位打印
-func autoSize(size ByteSize) string {
-	if size < KB {
-		return fmt.Sprintf("%.0f", size)
-	} else if size < MB {
-		return fmt.Sprintf("%.0fK", size/KB)
-	} else if size < GB {
-		return fmt.Sprintf("%.0fM", size/MB)
-	} else if size < TB {
-		return fmt.Sprintf("%.2fG", size/GB)
-	} else if size < PB {
-		return fmt.Sprintf("%.2fT", size/TB)
-	} else if size < EB {
-		return fmt.Sprintf("%.2fP", size/PB)
-	} else if size < ZB {
-		return fmt.Sprintf("%.2fE", size/EB)
-	} else if size < YB {
-		return fmt.Sprintf("%.2fZ", size/ZB)
+func autoSize(fsize float64) string {
+	if fsize < KB {
+		return fmt.Sprintf("%.0f ", fsize)
+	} else if fsize < MB {
+		return fmt.Sprintf("%.1fK", fsize/KB)
+	} else if fsize < GB {
+		return fmt.Sprintf("%.1fM", fsize/MB)
+	} else if fsize < TB {
+		return fmt.Sprintf("%.1fG", fsize/GB)
+	} else if fsize < PB {
+		return fmt.Sprintf("%.1fT", fsize/TB)
+	} else if fsize < EB {
+		return fmt.Sprintf("%.1fP", fsize/PB)
+	} else if fsize < ZB {
+		return fmt.Sprintf("%.1fE", fsize/EB)
+	} else if fsize < YB {
+		return fmt.Sprintf("%.1fZ", fsize/ZB)
 	}
-	return fmt.Sprintf("%.2fY", size/YB)
+	return fmt.Sprintf("%.1fY", fsize/YB)
 }

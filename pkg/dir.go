@@ -39,6 +39,7 @@ func ReadDir(dir *Dir) {
 		item.File.Name = info.Name()
 		item.File.IsDir = info.IsDir()
 		item.File.Size = ByteSize(info.Size())
+		item.File.SetUsage(info)
 		// 如果是目录的话，记录路径，文件的话不需要记录
 		if item.File.IsDir {
 			item.File.Path = filepath.Join(dir.File.Path, item.File.Name)
@@ -62,12 +63,13 @@ func ReadDir(dir *Dir) {
 	wg.Wait()
 
 	// 计算当前目录的大小
-	var dirSize ByteSize
+	var dirSize, dirUsage ByteSize
 	for index := range dir.Clilds {
-		dirSize = dirSize + dir.Clilds[index].File.Size
+		dirSize += dir.Clilds[index].File.Size
+		dirUsage += dir.Clilds[index].File.Usage
 	}
 
-	dir.File.Size = dirSize
+	dir.File.Size, dir.File.Usage = dirSize, dirUsage
 
 }
 

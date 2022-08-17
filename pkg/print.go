@@ -12,16 +12,14 @@ const space4 = "    "
 // 目录名打印为蓝色文字
 var dirP = color.BlueString
 
-/*
-	打印目录结构
-	dir 目录
-	level 要打印多少层
-	n 当前是
-*/
+// 打印目录结构
+// dir 目录
+// level 要打印多少层
+// n 当前是第几层目录
 func Print(dir *Dir, config Config, n int, head string) {
 
 	if n == 0 {
-		fmt.Printf("%-8s %s\n", renderSize(dir.File.Size, config.SzieUnit), dir.File.Name)
+		fmt.Printf("%8s %s\n", renderSize(dir.File, config), dir.File.Name)
 	}
 
 	len := len(dir.Clilds)
@@ -47,7 +45,7 @@ func Print(dir *Dir, config Config, n int, head string) {
 			fileNameP = item.File.Name
 		}
 
-		fmt.Printf("%-8s %s %s\n", renderSize(item.File.Size, config.SzieUnit), head+near, fileNameP)
+		fmt.Printf("%8s %s %s\n", renderSize(item.File, config), head+near, fileNameP)
 		if (config.PrintLevel < 0 || n < config.PrintLevel) && item.File.IsDir {
 			lastLevel := ""
 			if !isLast {
