@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/fatih/color"
 )
@@ -21,6 +22,10 @@ func Print(dir *Dir, config Config, n int, head string) {
 	if n == 0 {
 		fmt.Printf("%8s %s\n", renderSize(dir.File, config), dir.File.Name)
 	}
+
+	sort.SliceStable(dir.Clilds, func(i, j int) bool {
+		return dir.Clilds[i].File.Size > dir.Clilds[j].File.Size
+	})
 
 	len := len(dir.Clilds)
 	for index, item := range dir.Clilds {
