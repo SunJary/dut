@@ -3,7 +3,6 @@ package pkg
 import (
 	"errors"
 	"fmt"
-	"strings"
 )
 
 var AllowUnit = map[string]float64{
@@ -15,6 +14,20 @@ var AllowUnit = map[string]float64{
 	"E": EB,
 	"Z": ZB,
 	"Y": YB,
+}
+
+func IsAllowUnit(config Config) error {
+	if config.ByteSzieUnit == "" {
+		return nil
+	}
+	_, ok := AllowUnit[config.ByteSzieUnit]
+	if !ok {
+		err := errors.New(`flag -b, --byte Error:
+	Byte size unit allow [K|M|G|T|P|E|Z|Y]
+	or don't use -b flag to auto choose byte unit`)
+		return err
+	}
+	return nil
 }
 
 // 根据规则显示文件的大小
@@ -33,24 +46,16 @@ func renderSize(file File, config Config) string {
 		return autoSize(fsize)
 	}
 	// 以指定的单位打印
-	unitSz, err := SizeUnit2Byte(unit)
-	if err != nil {
-		return fmt.Sprintf("%.1f", fsize/unitSz)
-	}
+	unitSz := SizeUnit2Byte(unit)
+
 	return fmt.Sprintf("%.1f%s", fsize/unitSz, unit)
 }
 
 // 通过字符串单位获取单位的大小
-func SizeUnit2Byte(unit string) (float64, error) {
-	unit = strings.ToUpper(unit)
+func SizeUnit2Byte(unit string) float64 {
+	value := AllowUnit[unit]
 
-	value, ok := AllowUnit[unit]
-	if !ok {
-		err := errors.New("文件大小的单位不正确")
-		return 0, err
-	}
-
-	return value, nil
+	return value
 }
 
 // 自动以合适的单位打印

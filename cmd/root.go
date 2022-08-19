@@ -34,10 +34,15 @@ func init() {
 
 	rootCmd.Flags().BoolVarP(&config.Usage, "usage", "u", false, "usage")
 
-	rootCmd.Flags().StringVarP(&config.ByteSzieUnit, "byte", "b", "", "Byte size unit,allow K/M/G/T/P/E/Z/Y , default auto")
+	rootCmd.Flags().StringVarP(&config.ByteSzieUnit, "byte", "b", "", "Byte size unit,allow [K|M|G|T|P|E|Z|Y] , default auto")
 }
 
 func run(cmd *cobra.Command, args []string) {
-	config.Init()
+	err := config.Init()
+	if err != nil {
+		cobra.CheckErr(err)
+		return
+	}
+
 	pkg.RunDut(args, config)
 }
