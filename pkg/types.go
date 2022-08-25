@@ -1,10 +1,5 @@
 package pkg
 
-import (
-	"os"
-	"syscall"
-)
-
 type ByteSize float64
 
 const (
@@ -30,15 +25,4 @@ type File struct {
 type Dir struct {
 	File   File
 	Clilds []Dir
-}
-
-const devBSize = 512
-
-func (file *File) SetUsage(f os.FileInfo) {
-	switch stat := f.Sys().(type) {
-	case *syscall.Stat_t:
-		file.Usage = ByteSize(stat.Blocks * devBSize)
-	default:
-		file.Usage = file.Size
-	}
 }
